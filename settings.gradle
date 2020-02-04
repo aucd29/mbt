@@ -1,0 +1,2 @@
+include ':app', ':brigitte'
+rootProject.name='tube'
