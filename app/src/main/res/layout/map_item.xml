@@ -1,0 +1,43 @@
+<layout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable name="model" type="com.example.tube.ui.map.MapViewModel" />
+        <variable name="item" type="com.example.tube.model.local.recycler.SearchedData" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/map_item_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/dp18"
+        >
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/map_item_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:textSize="@dimen/sp17"
+            android:text="@{item.title}"
+            tools:text="어떠한상점이름"
+            android:textColor="@android:color/black"
+            />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/map_item_address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/map_item_title"
+            android:layout_marginTop="@dimen/dp5"
+            tools:text="어떠한상점주소 주소 주소"
+            android:textColor="#C5C5C5"
+            android:text="@{item.address}"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

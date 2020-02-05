@@ -1,32 +1,35 @@
 package com.example.tube.ui
 
-import android.os.Bundle
 import androidx.fragment.app.FragmentManager
-import brigitte.*
+import brigitte.FragmentAnim
+import brigitte.FragmentCommit
+import brigitte.FragmentParams
+import brigitte.show
+import com.example.tube.R
+import com.example.tube.ui.map.MapFragment
 import org.slf4j.LoggerFactory
 import javax.inject.Inject
 import javax.inject.Named
 
 /**
- * Created by <a href="mailto:aucd29@gmail.com">Burke Choi</a> on 2018. 12. 13. <p/>
+ * Created by <a href="mailto:aucd29@gmail.com">Burke Choi</a> on 2020. 2. 4. <p/>
  *
  */
 class Navigator @Inject constructor(
-    val manager: FragmentManager
+    @param:Named("activityFragmentManager") val manager: FragmentManager
 ) {
     companion object {
         private val logger = LoggerFactory.getLogger(Navigator::class.java)
 
-//        const val CONTAINER          = R.id.rootContainer
-//        const val FAVORITE_CONTAINER = R.id.favorite_container
+        const val CONTAINER = R.id.root_container
     }
 
-    fun mainFragment() {
+    fun mapFragment() {
         if (logger.isInfoEnabled) {
-            logger.info("MAIN FRAGMENT")
+            logger.info("MapFragment")
         }
 
-//        manager.show<MainFragment>(FragmentParams(CONTAINER, commit = FragmentCommit.NOW,
-//            backStack = false))
+        manager.show<MapFragment>(FragmentParams(CONTAINER, commit = FragmentCommit.NOW,
+            backStack = false, anim = FragmentAnim.RIGHT))
     }
 }

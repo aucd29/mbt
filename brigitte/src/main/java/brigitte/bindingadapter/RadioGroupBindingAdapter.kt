@@ -1,6 +1,7 @@
 @file:Suppress("NOTHING_TO_INLINE", "unused")
 package brigitte.bindingadapter
 
+import android.view.View
 import android.widget.RadioGroup
 import androidx.databinding.BindingAdapter
 import org.slf4j.LoggerFactory
@@ -14,14 +15,17 @@ object RadioGroupBindingAdapter {
 
     @JvmStatic
     @BindingAdapter("bindCheckedChangeListener")
-    fun bindCheckedChangeListener(view: RadioGroup, listener: ((Int) -> Unit)?) {
+    fun bindCheckedChangeListener(viewgroup: RadioGroup, listener: ((Int, Int) -> Unit)?) {
         if (logger.isDebugEnabled) {
             logger.debug("BIND CHECKED CHANGE LISTENER $listener")
         }
 
         listener?.let {
-            view.setOnCheckedChangeListener { _, id ->
-                it.invoke(id)
+            viewgroup.setOnCheckedChangeListener { _, id ->
+                val view = viewgroup.findViewById<View>(id)
+                val index = viewgroup.indexOfChild(view)
+
+                it.invoke(id, index)
             }
         }
     }

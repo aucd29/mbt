@@ -115,6 +115,10 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxandroid:$rxandroid"
     implementation "io.reactivex.rxjava2:rxkotlin:$rxkotlin"
 
+    // rxlocation : https://github.com/patloew/RxLocation
+    implementation 'com.patloew.rxlocation:rxlocation:1.0.5'
+    implementation 'com.google.android.gms:play-services-location:17.0.0'
+
     // KAKAO MAP
     implementation files('libs/libDaumMapAndroid.jar')
 

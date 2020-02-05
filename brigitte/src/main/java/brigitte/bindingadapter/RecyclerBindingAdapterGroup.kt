@@ -59,6 +59,26 @@ object RecyclerBindingAdapter {
     }
 
     @JvmStatic
+    @BindingAdapter("bindRecyclerItems")
+    fun <T: IRecyclerDiff> bindRecyclerItems(recycler: RecyclerView, items: List<T>?) {
+        val adapter: RecyclerAdapter<T>? = recycler.adapter as RecyclerAdapter<T>
+
+        if (logger.isDebugEnabled) {
+            logger.debug("BIND RECYCLER VIEW ITEM : ${items?.size}")
+        }
+
+        adapter?.let { recyclerAdapter ->
+            items?.let { recyclerItems ->
+                if (recyclerItems is ArrayList<T>) {
+                    recyclerAdapter.setItems(recycler, recyclerItems)
+                } else {
+                    logger.error("ERROR: INVALID LIST TYPE ")
+                }
+            }
+        }
+    }
+
+    @JvmStatic
     @BindingAdapter("bindItemTouchHelper")
     fun bindDragCallback(recycler: RecyclerView, helper: ItemTouchHelper?) {
         helper?.let {

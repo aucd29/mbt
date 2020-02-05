@@ -1,5 +1,6 @@
 package com.example.tube.di.module
 
+import com.example.tube.ui.map.MapFragment
 import dagger.Module
 
 /**
@@ -7,6 +8,6 @@ import dagger.Module
  */
 
 @Module(includes = [
-
+    MapFragment.Module::class
 ])
 abstract class FragmentModule

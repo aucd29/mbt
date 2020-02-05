@@ -1,6 +1,8 @@
 package com.example.tube.di.module.libs
 
 import android.content.Context
+import com.google.android.gms.location.LocationRequest
+import com.patloew.rxlocation.RxLocation
 import dagger.Module
 import dagger.Provides
 
@@ -13,18 +15,18 @@ import dagger.Provides
 
 @Module
 class RxLocationModule {
-//    companion object {
-//        private const val LOCATION_PRIORITY = LocationRequest.PRIORITY_LOW_POWER
-//    }
-//
-//    @Provides
-//    fun provideRxLocation(context: Context): RxLocation {
-//        return RxLocation(context)
-//    }
-//
-//    @Provides
-//    fun provideLocationRequest(): LocationRequest =
-//        LocationRequest.create().apply { priority =
-//            LOCATION_PRIORITY
-//        }
+    companion object {
+        private const val LOCATION_PRIORITY = LocationRequest.PRIORITY_LOW_POWER
+    }
+
+    @Provides
+    fun provideRxLocation(context: Context): RxLocation {
+        return RxLocation(context)
+    }
+
+    @Provides
+    fun provideLocationRequest(): LocationRequest =
+        LocationRequest.create().apply { priority =
+            LOCATION_PRIORITY
+        }
 }
