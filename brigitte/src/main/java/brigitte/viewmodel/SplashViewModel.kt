@@ -31,9 +31,9 @@ class SplashViewModel @Inject constructor(
         // 여지껏 커스텀 뷰를 만들어서 재활용한 적이 별로 없다.. -_ -;
     }
 
-    fun initTimeout() {
+    fun initTimeout(timeout: Long = SPLASH_TIMEOUT) {
         // 로딩 완료가 안뜨는 경우가 존재할 수 있으니 이를 보안하기 위한 타이머 추가
-        dp.add(singleTimer(SPLASH_TIMEOUT)
+        dp.add(singleTimer(timeout)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { _ ->
                 if (logger.isInfoEnabled && state) {

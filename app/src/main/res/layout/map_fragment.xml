@@ -35,6 +35,7 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:bindAdapter="@{model.adapter}"
             app:bindItems="@{model.items}"
+            app:bindItemDecoration="@{model.itemDecoration}"
             />
 
 <!--        새로고침-->
@@ -64,8 +65,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="@+id/map_daum_map"
             android:layout_margin="@dimen/dp15"
-            app:bindCheckedChangeListener="@{model.checkedListener}"
             android:checkedButton="@+id/map_category_hospital"
+            app:bindCheckedChangeListener="@{model.checkedListener}"
             >
 
             <RadioButton
@@ -112,6 +113,7 @@
             android:padding="@dimen/dp10"
             android:gravity="center"
             tools:text="더 보기"
+            android:background="?selectableItemBackground"
             android:onClick="@{() -> model.command(model.ITN_MORE)}"
             />
 

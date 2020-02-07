@@ -10,6 +10,7 @@ import brigitte.runtimepermission.runtimePermissions
 import brigitte.viewmodel.SplashViewModel
 import com.example.tube.databinding.MainActivityBinding
 import com.example.tube.ui.Navigator
+import com.example.tube.ui.map.MapFragment
 import okhttp3.OkHttpClient
 import org.slf4j.LoggerFactory
 import javax.inject.Inject
@@ -35,9 +36,22 @@ class MainActivity : BaseDaggerActivity<MainActivityBinding, MainViewModel>() {
             logger.debug("START ACTIVITY")
         }
 
-        if (savedInstanceState == null) {
-            navigator.mapFragment()
-        }
+        runtimePermissions(PermissionParams(this@MainActivity,
+            arrayListOf(Manifest.permission.ACCESS_FINE_LOCATION), { reqCode, result ->
+                if (logger.isDebugEnabled) {
+                    logger.debug("PERMISSION RESULT : $reqCode($result)")
+                }
+
+                if (result) {
+                    if (savedInstanceState == null) {
+                        navigator.mapFragment()
+                        splashViewModel.initTimeout()
+                    }
+                } else {
+                    finish()
+                }
+            }, 1)
+        )
     }
 
     override fun initViewBinding() {

@@ -37,29 +37,23 @@ class MapFragment @Inject constructor(
         get() = binding.mapDaumMap.mapView
 
     override fun initViewBinding() {
-        viewModel.initAdapter(R.layout.map_item)
         binding.mapDaumMap.initMapLayout(requireActivity())
 
-        runtimePermissions(PermissionParams(requireActivity(),
-            arrayListOf(Manifest.permission.ACCESS_FINE_LOCATION), { reqCode, result ->
-                if (logger.isDebugEnabled) {
-                    logger.debug("PERMISSION RESULT : $reqCode($result)")
-                }
-
-                if (result) {
-                    viewModel.initLocationData()
-                } else {
-                    requireActivity().finish()
-                }
-            }, 1)
-        )
     }
 
     override fun initViewModelEvents() {
-
+        viewModel.apply {
+            initAdapter(R.layout.map_item)
+            adapter.get()?.isScrollToPosition = false
+            initLocationData()
+        }
     }
 
     override fun onCommandEvent(cmd: String, data: Any) {
+        if (logger.isDebugEnabled) {
+            logger.debug("CMD : $cmd")
+        }
+
         when (cmd) {
             MapViewModel.CMD_INIT_LOCATION -> {
                 splashViewModel.closeSplash()
@@ -82,6 +76,11 @@ class MapFragment @Inject constructor(
 
         savedInstanceState?.let {
             val categoryId = it.getInt(STS_MAP_CATEGORY)
+
+            if (logger.isInfoEnabled) {
+                logger.info("RESTORE CATEGORY : $categoryId")
+            }
+
             binding.mapRadioGroup.check(categoryId)
         }
     }

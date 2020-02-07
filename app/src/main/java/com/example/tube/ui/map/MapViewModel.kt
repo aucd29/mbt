@@ -5,6 +5,7 @@ import android.view.View
 import androidx.databinding.ObservableField
 import androidx.databinding.ObservableInt
 import brigitte.*
+import brigitte.widget.viewpager.OffsetDividerItemDecoration
 import com.example.tube.R
 import com.example.tube.common.widget.DaumMapView
 import com.example.tube.model.local.recycler.SearchedData
@@ -43,12 +44,15 @@ class MapViewModel @Inject constructor(
     val viewRefresh  = ObservableInt(View.GONE)
     val viewProgress = ObservableInt(View.GONE)
     val centerPoint  = ObservableField<Pair<Double, Double>>()
+    val itemDecoration = ObservableField(OffsetDividerItemDecoration(app, R.drawable.shape_divider_gray, 15))
     val mapCallback  = ObservableField<(Int, Any?) -> Unit> { type, pt ->
         when (type) {
             DaumMapView.ITEM_SELECTED -> {
                 pt?.let {
                     if (it is MapPOIItem) {
-                        it.itemName
+                        it.mapPoint.mapPointGeoCoord.apply {
+                            centerPoint(latitude, longitude)
+                        }
                     }
                 }
             }
@@ -61,7 +65,7 @@ class MapViewModel @Inject constructor(
                 // 현재 위치 갱신
                 pt?.let {
                     if (it is MapPoint) {
-                        _latitude = it.mapPointGeoCoord.latitude.toString()
+                        _latitude  = it.mapPointGeoCoord.latitude.toString()
                         _longitude = it.mapPointGeoCoord.longitude.toString()
                     }
                 }
@@ -81,12 +85,15 @@ class MapViewModel @Inject constructor(
             logger.debug("CATEGORY : $category")
         }
 
+        // 카테고리 변경이니 마커도 초기화
+        command(CMD_CLEAR_ALL_MARKER)
+
         // 페이지 번호 초기화
-        page = 1
+        initPage()
         search(_longitude, _latitude, page)
     }
 
-    var category: String = "PM9" //"HP8"
+    var category: String = "HP8" //"HP8"
     var categoryId: Int = 0
 
     private var _longitude: String = ""
@@ -99,21 +106,27 @@ class MapViewModel @Inject constructor(
 
     private var page: Int = 1
     private val dp = CompositeDisposable()
+    private var isEnded = false
 
+    private fun initPage() {
+        page = 1
+        isEnded = false
+    }
 
     fun initLocationData() {
         dp.add(rxLocation.location().updates(locationRequest)
             .subscribe({
                 _longitude = it.longitude.toString()
-                _latitude = it.latitude.toString()
+                _latitude  = it.latitude.toString()
 
                 if (logger.isDebugEnabled) {
                     logger.debug("LOCATION X: $_longitude, Y: $_latitude")
                 }
 
                 // 현재 위치로 이동
-                centerPoint.set(latitude to longitude)
+                centerPoint(latitude, longitude)
 
+                initPage()
                 command(CMD_INIT_LOCATION)
                 search(_longitude, _latitude, page)
             }, ::errorLog))
@@ -122,6 +135,11 @@ class MapViewModel @Inject constructor(
     fun search(longitude: String, latitude: String, page: Int) {
         if (logger.isDebugEnabled) {
             logger.debug("SEARCH : $page")
+        }
+
+        if (isEnded) {
+            toast(R.string.map_end_page)
+            return
         }
 
         viewProgress.visible()
@@ -134,9 +152,7 @@ class MapViewModel @Inject constructor(
                     items.set(list)
                 } else {
                     if (it.meta.is_end) {
-                        viewProgress.gone()
-                        toast(R.string.map_end_page)
-                        return@subscribe
+                        isEnded = true
                     }
 
                     val newList = items.get()?.toMutableList()
@@ -157,6 +173,10 @@ class MapViewModel @Inject constructor(
         super.onCleared()
     }
 
+    private fun centerPoint(latitude: Double, longitude: Double) {
+        centerPoint.set(latitude to longitude)
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////
     //
     // COMAMND
@@ -174,7 +194,7 @@ class MapViewModel @Inject constructor(
                 command(CMD_CLEAR_ALL_MARKER)
                 viewRefresh.gone()
 
-                page = 1
+                initPage()
                 search(_longitude, _latitude, page)
             }
 

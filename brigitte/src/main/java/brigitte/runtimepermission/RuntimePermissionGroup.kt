@@ -156,9 +156,7 @@ open class PermissionFragment : Fragment() {
         when (requestCode) {
             REQ_SETTING_EVENT -> {
                 val result = RuntimePermission.checkPermissions(mParams.activity, mParams.permissions)
-                if (result) {
-                    mParams.listener.invoke(mParams.reqCode, true)
-                }
+                mParams.listener.invoke(mParams.reqCode, result)
             }
         }
     }
@@ -191,9 +189,9 @@ open class PermissionFragment : Fragment() {
                     startActivityForResult(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                         data = Uri.parse(("package:${mParams.activity.packageName}"))
                     }, REQ_SETTING_EVENT)
+                } else {
+                    mParams.listener.invoke(mParams.reqCode, false)
                 }
-
-                mParams.listener.invoke(mParams.reqCode, result)
             }))
     }
 }

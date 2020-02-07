@@ -36,6 +36,7 @@ class DaumMapView @JvmOverloads constructor(
             it.mapView.apply {
                 setOpenAPIKeyAuthenticationResultListener(this@DaumMapView)
                 setMapViewEventListener(this@DaumMapView)
+                setPOIItemEventListener(this@DaumMapView)
                 mapType = MapView.MapType.Standard
             }
 
@@ -69,9 +70,9 @@ class DaumMapView @JvmOverloads constructor(
         if (logger.isDebugEnabled) {
             logger.debug("MapView had loaded. Now, MapView APIs could be called safely")
         }
-        map?.apply {
-            setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(37.537229,127.005515), 2, true)
-        }
+//        map?.apply {
+//            setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(37.537229,127.005515), 2, true)
+//        }
 
         callback?.invoke(INIT, null)
     }
@@ -198,6 +199,9 @@ class DaumMapView @JvmOverloads constructor(
     }
 
     override fun onDraggablePOIItemMoved(p0: MapView?, p1: MapPOIItem?, p2: MapPoint?) {
+        if (logger.isDebugEnabled) {
+            logger.debug("onDraggablePOIItemMoved ")
+        }
     }
 
     override fun onPOIItemSelected(p0: MapView?, p1: MapPOIItem?) {
