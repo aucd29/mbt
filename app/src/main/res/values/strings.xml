@@ -11,4 +11,5 @@
     <string name="map_gas_station">주유소</string>
 
     <string name="map_end_page">마지막 페이지 입니다.</string>
+    <string name="common_network_not_connected">네트워크가 연결되지 않았습니다.</string>
 </resources>

@@ -61,6 +61,7 @@ class MapFragment @Inject constructor(
 
             MapViewModel.CMD_CLEAR_ALL_MARKER -> {
                 map?.removeAllPOIItems()
+                binding.mapRecycler.scrollToPosition(0)
             }
         }
     }

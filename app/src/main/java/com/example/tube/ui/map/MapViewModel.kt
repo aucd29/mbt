@@ -137,6 +137,11 @@ class MapViewModel @Inject constructor(
             logger.debug("SEARCH : $page")
         }
 
+        if (!app.isNetworkConntected()) {
+            toast(R.string.common_network_not_connected)
+            return
+        }
+
         if (isEnded) {
             toast(R.string.map_end_page)
             return
