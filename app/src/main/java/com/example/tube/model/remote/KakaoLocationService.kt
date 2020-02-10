@@ -28,6 +28,4 @@ interface KakaoLocationService {
                        @Query("page") page: Int = 1,
                        @Query("radius") radius: Int = 5000,
                        @Query("size") size: Int = 15): Single<KakaoLocation>
-
-//    @Query("rect") rect: String,
 }

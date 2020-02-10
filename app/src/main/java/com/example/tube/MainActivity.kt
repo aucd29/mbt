@@ -10,12 +10,11 @@ import brigitte.runtimepermission.runtimePermissions
 import brigitte.viewmodel.SplashViewModel
 import com.example.tube.databinding.MainActivityBinding
 import com.example.tube.ui.Navigator
-import com.example.tube.ui.map.MapFragment
 import okhttp3.OkHttpClient
 import org.slf4j.LoggerFactory
 import javax.inject.Inject
 
-class MainActivity : BaseDaggerActivity<MainActivityBinding, MainViewModel>() {
+class MainActivity : BaseDaggerActivity<MainActivityBinding, SplashViewModel>() {
     companion object {
         private val logger = LoggerFactory.getLogger(MainActivity::class.java)
     }
@@ -23,8 +22,6 @@ class MainActivity : BaseDaggerActivity<MainActivityBinding, MainViewModel>() {
     override val layoutId = R.layout.main_activity
 
     @Inject lateinit var navigator: Navigator
-
-    private val splashViewModel: SplashViewModel by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         exceptionCatcher { logger.error("ERROR: $it") }
@@ -36,6 +33,9 @@ class MainActivity : BaseDaggerActivity<MainActivityBinding, MainViewModel>() {
             logger.debug("START ACTIVITY")
         }
 
+        // 런타임 퍼미션 확인
+        // 확인 되면 map fragment 호출 아니면
+        // 안내 팝업창 띄우고 사용자가 직접 퍼미션 승낙을 유도하지만 결국 안하면 앱 종료
         runtimePermissions(PermissionParams(this@MainActivity,
             arrayListOf(Manifest.permission.ACCESS_FINE_LOCATION), { reqCode, result ->
                 if (logger.isDebugEnabled) {
@@ -45,7 +45,7 @@ class MainActivity : BaseDaggerActivity<MainActivityBinding, MainViewModel>() {
                 if (result) {
                     if (savedInstanceState == null) {
                         navigator.mapFragment()
-                        splashViewModel.initTimeout()
+                        viewModel.initTimeout()
                     }
                 } else {
                     finish()
@@ -58,10 +58,10 @@ class MainActivity : BaseDaggerActivity<MainActivityBinding, MainViewModel>() {
     }
 
     override fun initViewModelEvents() {
-        splashViewModel.run {
-            observe(closeEvent) {
-                binding.activityContainer.removeView(binding.splash)
-            }
+        // splash 화면이 종료 되었다고 알리면 main_activity 에 등록되어 있는
+        // splash 를 remove view 함
+        observe(viewModel.closeEvent) {
+            binding.activityContainer.removeView(binding.splash)
         }
     }
 

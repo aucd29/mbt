@@ -1,6 +1,5 @@
 package com.example.tube.common.bindingadapter
 
-import android.graphics.Color
 import androidx.databinding.BindingAdapter
 import com.example.tube.common.widget.DaumMapView
 import com.example.tube.model.local.recycler.SearchedData

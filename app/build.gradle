@@ -43,14 +43,14 @@ android {
 
     // https://medium.com/@joongwon/%EC%BD%94%ED%8B%80%EB%A6%B0-kotlin-with-dagger2-11fe36126dd6
     kapt {
-        generateStubs = true
+        generateStubs     = true
         correctErrorTypes = true
     }
 
     testOptions {
         unitTests {
             includeAndroidResources = true
-            returnDefaultValues = true
+            returnDefaultValues     = true
         }
     }
 
@@ -63,8 +63,18 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+    testImplementation "org.mockito:mockito-core:2.25.0"
+    testImplementation 'org.mockito:mockito-inline:2.13.0'
+    testImplementation 'ch.qos.logback:logback-classic:1.2.3'
+    testImplementation 'androidx.test:core:1.2.0'
+    testImplementation 'androidx.test:rules:1.2.0'
+    testImplementation 'androidx.test.ext:junit:1.1.1'
+    testImplementation "androidx.arch.core:core-testing:2.1.0"
+    testImplementation "org.robolectric:robolectric:4.3.1"
+    testImplementation "javax.annotation:javax.annotation-api:1.3.2"
+
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
     //
     // KOTLIN

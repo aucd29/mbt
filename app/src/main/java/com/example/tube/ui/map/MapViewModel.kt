@@ -2,8 +2,10 @@ package com.example.tube.ui.map
 
 import android.app.Application
 import android.view.View
+import androidx.annotation.VisibleForTesting
 import androidx.databinding.ObservableField
 import androidx.databinding.ObservableInt
+import androidx.lifecycle.MutableLiveData
 import brigitte.*
 import brigitte.widget.viewpager.OffsetDividerItemDecoration
 import com.example.tube.R
@@ -22,6 +24,13 @@ import javax.inject.Inject
 
 /**
  * Created by <a href="mailto:aucd29@hanwha.com">Burke Choi</a> on 2020-02-05 <p/>
+ *
+ * 요구사항
+ * ----
+ * 1. 카테고리 에 따라 (병원, 약국, 주유소) 지도 중심 근처로 검색해 다음지도와, 리스트에 표기 (단 장소명, 도로명 주소로 표기)
+ * 2. 더 보기 버튼 선택 시 다음 페이지를 로드하고 1 형태로 추가
+ * 3. 새로고침을 선택 시 모든 마커와 리스트를 제거 한 뒤 지도 중심위치 기준으로 다시 검색 (단 새로고침 버튼은 지도 이동시에만 화면에 표기)
+ * 4. 지도의 처음 위치는 현재 기기 위치이고 마커 를 선택하면 마커가 지도 중심으로 이동 해야 하고 현재 위치는 빨간 점으로 표기해야 함
  */
 
 class MapViewModel @Inject constructor(
@@ -37,9 +46,9 @@ class MapViewModel @Inject constructor(
         const val ITN_REFRESH = "refresh"
         const val ITN_MORE    = "more"
 
-        const val CMD_INIT_LOCATION     = "init-location"
-        const val CMD_ERROR_LOCATION    = "error-location"
-        const val CMD_CLEAR_ALL_MARKER  = "clear-all-marker"
+        const val CMD_INIT_LOCATION         = "init-location"
+        const val CMD_ERROR_LOCATION        = "error-location"
+        const val CMD_CLEAR_ALL_MARKER      = "clear-all-marker"
         const val CMD_SHOW_CURRENT_LOCATION = "show-current-location"
     }
 
@@ -47,7 +56,7 @@ class MapViewModel @Inject constructor(
     val viewProgress = ObservableInt(View.GONE)
     val centerPoint  = ObservableField<Pair<Double, Double>>()
     val itemDecoration = ObservableField(OffsetDividerItemDecoration(app, R.drawable.shape_divider_gray, 15))
-    val mapCallback  = ObservableField<(Int, Any?) -> Unit> { type, pt ->
+    val mapCallback  = MutableLiveData<(Int, Any?) -> Unit> { type, pt ->
         when (type) {
             DaumMapView.ITEM_SELECTED -> {
                 pt?.let {
@@ -77,6 +86,7 @@ class MapViewModel @Inject constructor(
         }
     }
 
+    // 카테고리 radio 버튼 선택 시 옵저빙 되는 리스너
     val checkedListener = ObservableField<(Int, Int) -> Unit> { id, index ->
         categoryId = id
         category   = when (index) {
@@ -92,29 +102,29 @@ class MapViewModel @Inject constructor(
         // 카테고리 변경이니 마커도 초기화
         command(CMD_CLEAR_ALL_MARKER)
 
-        // 페이지 번호 초기화
+        // 페이지 번호 초기화 (radio 버튼을 선택하면 페이지 번호도 초기화 해야 한다.)
         initPage()
         search(_longitude, _latitude, page)
     }
 
     var category: String = "HP8"
-    var categoryId: Int = 0
+    var categoryId: Int  = 0
 
     private var _longitude: String = ""
-    private var _latitude: String = ""
+    private var _latitude: String  = ""
 
     val longitude: Double
-        get() = _longitude.toDouble()
+        get() = if (_longitude.isEmpty()) 0.0 else _longitude.toDouble()
     val latitude: Double
-        get() = _latitude.toDouble()
+        get() = if (_latitude.isEmpty()) 0.0 else _latitude.toDouble()
 
     private var page: Int = 1
     private val dp        = CompositeDisposable()
-    private var isEnded   = false
+    private var _isEnded  = false
 
     private fun initPage() {
-        page = 1
-        isEnded = false
+        page    = 1
+        _isEnded = false
     }
 
     fun initLocationData() {
@@ -153,7 +163,7 @@ class MapViewModel @Inject constructor(
             return
         }
 
-        if (isEnded) {
+        if (_isEnded) {
             toast(R.string.map_end_page)
             return
         }
@@ -165,13 +175,13 @@ class MapViewModel @Inject constructor(
             .subscribe ({
                 val list = DataMapper.convert(it)
 
+                if (it.meta.is_end) {
+                    _isEnded = true
+                }
+
                 if (page == 1) {
                     items.set(list)
                 } else {
-                    if (it.meta.is_end) {
-                        isEnded = true
-                    }
-
                     val newList = items.get()?.toMutableList()
                     newList?.addAll(list)
 
@@ -190,11 +200,8 @@ class MapViewModel @Inject constructor(
         super.onCleared()
     }
 
-    private fun centerPoint(latitude: Double, longitude: Double) {
+    fun centerPoint(latitude: Double, longitude: Double) {
         centerPoint.set(latitude to longitude)
-    }
-
-    private fun currentPosition() {
     }
 
     ////////////////////////////////////////////////////////////////////////////////////
@@ -221,4 +228,17 @@ class MapViewModel @Inject constructor(
             else -> super.command(cmd, data)
         }
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////
+    //
+    // TEST
+    //
+    ////////////////////////////////////////////////////////////////////////////////////
+
+    @VisibleForTesting
+    var isEnded: Boolean
+        get() = _isEnded
+        set(value) {
+            _isEnded = value
+        }
 }

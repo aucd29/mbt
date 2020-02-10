@@ -3,6 +3,7 @@ package brigitte.shield
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import androidx.annotation.ColorRes
@@ -14,6 +15,7 @@ import brigitte.systemService
 import org.mockito.MockitoAnnotations
 import org.robolectric.Shadows
 import org.robolectric.shadows.ShadowApplication
+import org.robolectric.shadows.ShadowLocationManager
 import org.robolectric.shadows.ShadowNetworkInfo
 
 /**
@@ -63,5 +65,21 @@ open class BaseRoboTest constructor()  {
     }
     protected inline  fun mockDisableNetwork() {
         shadowNetworkInfo?.setConnectionStatus(NetworkInfo.State.DISCONNECTED)
+    }
+
+    protected var shadowLocationManager: ShadowLocationManager? = null
+
+    protected inline fun mockLocation() {
+        app.systemService<LocationManager>()?.let {
+            shadowLocationManager = Shadows.shadowOf(it)
+        }
+    }
+
+    protected inline fun mockEnableLocation() {
+        shadowLocationManager?.setLocationEnabled(true)
+    }
+
+    protected inline fun mockDisableLocation() {
+        shadowLocationManager?.setLocationEnabled(false)
     }
 }

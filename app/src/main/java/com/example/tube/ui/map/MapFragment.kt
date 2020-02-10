@@ -29,21 +29,25 @@ class MapFragment @Inject constructor(
         private const val STS_MAP_CATEGORY = "map-category"
     }
 
-    /** layout id */
     override val layoutId = R.layout.map_fragment
 
+    // main 과 viewmodel 공유
     private val splashViewModel: SplashViewModel by activityInject()
     private val map: MapView?
         get() = binding.mapDaumMap.mapView
 
     override fun initViewBinding() {
-        binding.mapDaumMap.initMapLayout(requireActivity())
-        binding.mapDaumMap.mapView?.setShowCurrentLocationMarker(false)
+        binding.mapDaumMap.apply {
+            initMapLayout(requireActivity())
+            mapView?.setShowCurrentLocationMarker(false)
+        }
     }
 
     override fun initViewModelEvents() {
         viewModel.apply {
             initAdapter(R.layout.map_item)
+
+            // 아이템 추가 시 자동으로 스크롤 되지 않도록 수정
             adapter.get()?.isScrollToPosition = false
             initLocationData()
         }
@@ -57,23 +61,26 @@ class MapFragment @Inject constructor(
         MapViewModel.run {
             when (cmd) {
                 CMD_INIT_LOCATION ->
+                    // viewmodel 에서 현재 location 정보를 얻으면 splash 화면을 종료
                     splashViewModel.closeSplash()
 
                 CMD_ERROR_LOCATION ->
+                    // gps 설정이 off 일떄 오류 발생
                     alert(R.string.map_location_not_enabled, listener = { _, _ ->
                         requireActivity().finish()
                     })
 
                 CMD_CLEAR_ALL_MARKER -> {
+                    // 새로고침 버튼 선택 시 기존의
                     map?.removeAllPOIItems()
                     binding.mapRecycler.scrollToPosition(0)
                 }
 
                 CMD_SHOW_CURRENT_LOCATION ->
+                    // 현재 단말 위치를 화면에 표기
                     showCurrentLocation()
             }
         }
-
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
