@@ -10,13 +10,9 @@ import dagger.Module
  */
 
 @Module(includes = [
-//    CalligraphyModule::class,
-//    ChipModule::class,
     RxLocationModule::class,
     RxModule::class,
-    DbModule::class,
     ViewModelModule::class,
     ViewModelFactoryModule::class
-//    KakaoModule::class
 ])
 class UtilModule

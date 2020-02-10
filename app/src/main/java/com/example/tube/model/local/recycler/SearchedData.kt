@@ -20,7 +20,7 @@ data class SearchedData(
 
     override fun contentsSame(item: IRecyclerDiff): Boolean {
         val newItem = item as SearchedData
-        return item.title == (newItem).title && item.address == (newItem).address
+        return item.title == newItem.title && item.address == newItem.address
     }
 }
 

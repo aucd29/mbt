@@ -28,7 +28,7 @@ class NetworkModule {
     companion object {
         val LOG_CLASS = NetworkModule::class.java
 
-        const val KAKAO_DAPI_URL = "https://dapi.kakao.com/"
+        const val KAKAO_DAPI_URL    = "https://dapi.kakao.com/"
 
         const val KAKAO_AK          = "KakaoAK"
         const val AUTHORIZATION     = "Authorization"
