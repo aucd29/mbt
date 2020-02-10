@@ -149,7 +149,7 @@ class MapViewModelTest: BaseRoboViewModelTest<MapViewModel>() {
                     "same_name": null,
                     "pageable_count": 11,
                     "total_count": 11,
-                    "is_end": true
+                    "is_end": false
                   },
                   "documents": [
                     {
@@ -185,6 +185,49 @@ class MapViewModelTest: BaseRoboViewModelTest<MapViewModel>() {
             }
 
             viewProgress.assertEquals(View.GONE)
+            isEnded.assertFalse()
+
+
+            // 2페이지 검색
+            val mockData2 = """
+                {
+                  "meta": {
+                    "same_name": null,
+                    "pageable_count": 11,
+                    "total_count": 11,
+                    "is_end": true
+                  },
+                  "documents": [
+                    {
+                      "place_name": "장생당약국2",
+                      "distance": "",
+                      "place_url": "http://place.map.kakao.com/16618597",
+                      "category_name": "의료,건강 > 약국",
+                      "address_name": "서울 강남구 대치동 943-16",
+                      "road_address_name": "서울 강남구 테헤란로84길 17",
+                      "id": "16618597",
+                      "phone": "02-558-5476",
+                      "category_group_code": "PM9",
+                      "category_group_name": "약국",
+                      "x": "127.05897078335246",
+                      "y": "37.506051888130386"
+                    }
+                  ]
+                }
+            """.trimIndent().jsonParse<KakaoLocation>()
+
+            api.searchCategory(category, LONG.toString(), LAT.toString(), 2).mockReturn(
+                Single.just(mockData2))
+
+            search(LONG.toString(), LAT.toString(), 2)
+
+            items.get()?.apply {
+                size.assertEquals(2)
+                get(1).apply {
+                    title.assertEquals("장생당약국2")
+                }
+            }
+
             isEnded.assertTrue()
         }
     }
