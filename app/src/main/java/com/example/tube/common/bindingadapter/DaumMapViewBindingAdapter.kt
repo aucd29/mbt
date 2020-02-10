@@ -7,6 +7,7 @@ import com.example.tube.model.local.recycler.SearchedData
 import net.daum.mf.map.api.MapPOIItem
 import net.daum.mf.map.api.MapPoint
 import org.slf4j.LoggerFactory
+import java.lang.StringBuilder
 
 /**
  * Created by <a href="mailto:aucd29@hanwha.com">Burke Choi</a> on 2020-02-05 <p/>
@@ -20,6 +21,7 @@ object DaumMapViewBindingAdapter {
     fun bindMarker(view: DaumMapView, dataList: List<SearchedData>?) {
         view.mapView?.let { map ->
             val poiItems = arrayListOf<MapPOIItem>()
+            val sb = StringBuilder()
             dataList?.forEach {
                 poiItems.add(MapPOIItem().apply{
                     itemName           = it.title
@@ -28,9 +30,11 @@ object DaumMapViewBindingAdapter {
                     selectedMarkerType = MapPOIItem.MarkerType.RedPin
                 })
 
-                if (logger.isDebugEnabled) {
-                    logger.debug("MARKER : ${it.title}")
-                }
+                sb.append(it.title + ", ")
+            }
+
+            if (logger.isDebugEnabled) {
+                logger.debug("TITLE (${dataList?.size}): ${sb.toString()}")
             }
 
             map.addPOIItems(poiItems.toTypedArray())
@@ -54,4 +58,12 @@ object DaumMapViewBindingAdapter {
     fun bindMapEventCallback(view: DaumMapView, callback: ((type: Int, mapPoint: Any?) -> Unit)?) {
         view.callback = callback
     }
+
+//    @JvmStatic
+//    @BindingAdapter("bindCurrentLocation")
+//    fun bindCurrentLocation(view: DaumMapView) {
+//        view.mapView?.let { map ->
+//            map.setShowCurrentLocationMarker(true)
+//        }
+//    }
 }

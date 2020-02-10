@@ -1,19 +1,18 @@
 package com.example.tube.ui.map
 
-import android.Manifest
+import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import brigitte.BaseDaggerFragment
+import brigitte.alert
 import brigitte.di.dagger.scope.FragmentScope
-import brigitte.runtimepermission.PermissionParams
-import brigitte.runtimepermission.runtimePermissions
+import brigitte.finish
 import brigitte.viewmodel.SplashViewModel
 import com.example.tube.R
 import com.example.tube.databinding.MapFragmentBinding
 import dagger.Binds
 import dagger.android.ContributesAndroidInjector
 import net.daum.mf.map.api.MapPOIItem
-import net.daum.mf.map.api.MapPoint
 import net.daum.mf.map.api.MapView
 import org.slf4j.LoggerFactory
 import javax.inject.Inject
@@ -30,6 +29,7 @@ class MapFragment @Inject constructor(
         private const val STS_MAP_CATEGORY = "map-category"
     }
 
+    /** layout id */
     override val layoutId = R.layout.map_fragment
 
     private val splashViewModel: SplashViewModel by activityInject()
@@ -38,7 +38,7 @@ class MapFragment @Inject constructor(
 
     override fun initViewBinding() {
         binding.mapDaumMap.initMapLayout(requireActivity())
-
+        binding.mapDaumMap.mapView?.setShowCurrentLocationMarker(false)
     }
 
     override fun initViewModelEvents() {
@@ -54,16 +54,26 @@ class MapFragment @Inject constructor(
             logger.debug("CMD : $cmd")
         }
 
-        when (cmd) {
-            MapViewModel.CMD_INIT_LOCATION -> {
-                splashViewModel.closeSplash()
-            }
+        MapViewModel.run {
+            when (cmd) {
+                CMD_INIT_LOCATION ->
+                    splashViewModel.closeSplash()
 
-            MapViewModel.CMD_CLEAR_ALL_MARKER -> {
-                map?.removeAllPOIItems()
-                binding.mapRecycler.scrollToPosition(0)
+                CMD_ERROR_LOCATION ->
+                    alert(R.string.map_location_not_enabled, listener = { _, _ ->
+                        requireActivity().finish()
+                    })
+
+                CMD_CLEAR_ALL_MARKER -> {
+                    map?.removeAllPOIItems()
+                    binding.mapRecycler.scrollToPosition(0)
+                }
+
+                CMD_SHOW_CURRENT_LOCATION ->
+                    showCurrentLocation()
             }
         }
+
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -83,6 +93,49 @@ class MapFragment @Inject constructor(
             }
 
             binding.mapRadioGroup.check(categoryId)
+        }
+    }
+
+    override fun onDestroyView() {
+        hideCurrentLocation()
+        super.onDestroyView()
+    }
+
+    private fun showCurrentLocation() {
+        // binding adapter 로 빼도 되긴하는데 일단 이곳 커스텀 한정이라 일반화 하지 않음
+        map?.apply {
+            if (logger.isInfoEnabled) {
+                logger.info("SHOW CURRENT LOCATION")
+            }
+
+            setShowCurrentLocationMarker(true)
+
+            // 너무 눈에 안 띄어서 radius 추가
+            setCurrentLocationRadius(50)
+            setCurrentLocationRadiusFillColor(Color.argb(37, 255, 0, 0))
+            setCurrentLocationRadiusStrokeColor(Color.argb(77, 255, 0, 0))
+
+            setCustomCurrentLocationMarkerTrackingImage(R.drawable.custom_map_present_tracking,
+                MapPOIItem.ImageOffset(15, 15))
+            setCustomCurrentLocationMarkerDirectionImage(android.R.color.transparent,
+                MapPOIItem.ImageOffset(0, 0))
+            setCustomCurrentLocationMarkerImage(android.R.color.transparent,
+                MapPOIItem.ImageOffset(0, 0))
+
+            // http://apis.map.kakao.com/android/documentation/#MapView_Methods_setCurrentLocationTrackingMode
+            currentLocationTrackingMode =
+                MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeadingWithoutMapMoving
+        }
+    }
+
+    private fun hideCurrentLocation() {
+        map?.apply {
+            if (logger.isDebugEnabled) {
+                logger.debug("HIDE CURRENT LOCATION")
+            }
+
+            setShowCurrentLocationMarker(false)
+            currentLocationTrackingMode = MapView.CurrentLocationTrackingMode.TrackingModeOff
         }
     }
 

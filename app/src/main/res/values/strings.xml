@@ -9,7 +9,8 @@
     <string name="map_hospital">병원</string>
     <string name="map_pharmacy">약국</string>
     <string name="map_gas_station">주유소</string>
-
     <string name="map_end_page">마지막 페이지 입니다.</string>
+    <string name="map_location_not_enabled">이 앱은 GPS 가 활성화 되어야 올바르게 동작 합니다.\nGPS 를 활성화 시켜주세요</string>
+
     <string name="common_network_not_connected">네트워크가 연결되지 않았습니다.</string>
 </resources>

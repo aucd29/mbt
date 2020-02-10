@@ -79,8 +79,8 @@ class DaumMapView @JvmOverloads constructor(
 
     override fun onMapViewCenterPointMoved(map: MapView?, mapPoint: MapPoint?) {
         mapPoint?.mapPointGeoCoord?.apply {
-            if (logger.isDebugEnabled) {
-                logger.debug("MapView onMapViewCenterPointMoved ($latitude, $longitude)")
+            if (logger.isTraceEnabled) {
+                logger.trace("MapView onMapViewCenterPointMoved ($latitude, $longitude)")
             }
 
 //            toast("MapView onMapViewCenterPointMoved ($latitude, $longitude)")

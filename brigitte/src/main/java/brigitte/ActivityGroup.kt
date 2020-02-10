@@ -259,6 +259,7 @@ inline fun Activity.dialog(params: DialogParam, disposable: CompositeDisposable?
         params.dialog = bd.show()
     } else {
         bd.setMessage(params.message)
+        bd.setCancelable(false)
         params.apply {
             title?.let { bd.setTitle(it) }
             positiveStr?.let { bd.setPositiveButton(it) { dlg, _ ->

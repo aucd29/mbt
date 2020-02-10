@@ -102,6 +102,16 @@
         </RadioGroup>
 
 <!--        더보기-->
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/map_btn_more"
+            android:background="#efefef"
+            />
+
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/map_btn_more"
             android:layout_width="match_parent"

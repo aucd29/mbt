@@ -38,7 +38,9 @@ class MapViewModel @Inject constructor(
         const val ITN_MORE    = "more"
 
         const val CMD_INIT_LOCATION     = "init-location"
+        const val CMD_ERROR_LOCATION    = "error-location"
         const val CMD_CLEAR_ALL_MARKER  = "clear-all-marker"
+        const val CMD_SHOW_CURRENT_LOCATION = "show-current-location"
     }
 
     val viewRefresh  = ObservableInt(View.GONE)
@@ -54,6 +56,8 @@ class MapViewModel @Inject constructor(
                             centerPoint(latitude, longitude)
                         }
                     }
+
+                    command(CMD_SHOW_CURRENT_LOCATION)
                 }
             }
 
@@ -93,7 +97,7 @@ class MapViewModel @Inject constructor(
         search(_longitude, _latitude, page)
     }
 
-    var category: String = "HP8" //"HP8"
+    var category: String = "HP8"
     var categoryId: Int = 0
 
     private var _longitude: String = ""
@@ -105,8 +109,8 @@ class MapViewModel @Inject constructor(
         get() = _latitude.toDouble()
 
     private var page: Int = 1
-    private val dp = CompositeDisposable()
-    private var isEnded = false
+    private val dp        = CompositeDisposable()
+    private var isEnded   = false
 
     private fun initPage() {
         page = 1
@@ -114,6 +118,11 @@ class MapViewModel @Inject constructor(
     }
 
     fun initLocationData() {
+        if (!app.isLocationEnabled()) {
+            command(CMD_ERROR_LOCATION)
+            return
+        }
+
         dp.add(rxLocation.location().updates(locationRequest)
             .subscribe({
                 _longitude = it.longitude.toString()
@@ -138,6 +147,8 @@ class MapViewModel @Inject constructor(
         }
 
         if (!app.isNetworkConntected()) {
+            logger.error("ERROR: NETWORK NOT CONNECTED")
+
             toast(R.string.common_network_not_connected)
             return
         }
@@ -149,6 +160,7 @@ class MapViewModel @Inject constructor(
 
         viewProgress.visible()
         dp.add(api.searchCategory(category, longitude, latitude, page)
+//            .filter(!isEnded)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe ({
                 val list = DataMapper.convert(it)
@@ -180,6 +192,9 @@ class MapViewModel @Inject constructor(
 
     private fun centerPoint(latitude: Double, longitude: Double) {
         centerPoint.set(latitude to longitude)
+    }
+
+    private fun currentPosition() {
     }
 
     ////////////////////////////////////////////////////////////////////////////////////
